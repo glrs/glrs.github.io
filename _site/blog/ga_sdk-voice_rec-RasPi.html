@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  
+  
+  
+
+  
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Google Assistant SDK with Snowboy on Raspberry Pi">
+  <meta property="og:description" content="Here I dispose Projects / Solutions / Ideas">
+  <meta property="og:image" content="img/my_avatar_icon.png">
+
+  <title>Google Assistant SDK with Snowboy on Raspberry Pi</title>
+  <meta name="description" content="Here I dispose Projects / Solutions / Ideas">
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Theme style -->
+  <script src="/assets/js/theme.js"></script>
+
+  <!-- Font Awesome CDN -->
+  <!--
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
+  -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+</head>
+
+<body class="h-100 d-flex flex-column">
+
+  <main class="flex-shrink-0 container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-themed">
+
+  <a class="navbar-brand" href="/"><h5><b>playground</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-1x fa-bars text-themed"></i>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto">
+<a class="nav-item nav-link " href="/apps/">Dev / Apps</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+      <span id="theme-toggler" class="nav-item nav-link" role="button" onclick="toggleTheme()"></span>
+    </div>
+  </div>
+
+</nav>
+    <div class="col-lg-10 mx-auto mt-5 markdown-body">
+  <h1><b>Google Assistant SDK with Snowboy on Raspberry Pi</b></h1>
+
+<p class="post-metadata text-muted">
+  17 December 2019 -  
+  <b>21 mins read time</b>
+
+  <br>Tags: 
+    
+    <a class="text-decoration-none no-underline" href="/blog/tags#raspberry-pi">
+      <span class="tag badge badge-pill text-primary border border-primary">raspberry-pi</span>
+    </a>
+    
+    <a class="text-decoration-none no-underline" href="/blog/tags#home-automation">
+      <span class="tag badge badge-pill text-primary border border-primary">home-automation</span>
+    </a>
+    </p>
+
+<p>Here I explain how I solved several issues I faced setting up <em>Google Assistant SDK</em> with hotword activation on Raspberry Pi. For the hotword I used <em>Snowboy</em>, however, I had to do some work to make it work with Google Assistant. As it turned out, some of the issues I faced are known problems, discussed in several online communities. So if you are facing some of those issues, this article is for you!</p>
+
+<p><strong>TL;DR</strong>: If you just want to make it work without a deep understanding, just read my <a href="#summary">Summary</a> at the end of this post :)</p>
+
+<h2 id="intro">Intro</h2>
+<p>Like many people, I had the idea to build a Home Assistant on Raspberry Pi, with some added functionality later on. I was not sure which software to use so after some search I decided to try <a href="https://github.com/shivasiddharth/GassistPi">GassistPi</a>. <em>GassistPi</em> was built for expanding Google Assistant’s features, which was great for my use-case. Though it uses the <em>Google Assistant Library</em>, which is deprecated:</p>
+<blockquote>
+  <p><img class="emoji" title=":small_red_triangle:" alt=":small_red_triangle:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f53a.png" height="20" width="20"> <strong>Warning:</strong> The Google Assistant Library for Python is deprecated as of June 28th, 2019. Use the <a href="https://developers.google.com/assistant/sdk/guides/service/python/">Google Assistant Service</a> instead.</p>
+</blockquote>
+
+<p>Deprecated is not necessarily bad, but since Google provides the new <em>Google Assistant SDK</em> alternative I wanted to try it. And that’s how my story into the darkness begins…</p>
+
+<h2 id="setup">Setup</h2>
+<p>Before we walk into the dark side, let me quickly introduce you to my setup as a point of reference. I use the <a href="https://www.raspberrypi.org/products/raspberry-pi-3-model-b/">Raspberry Pi 3 model B</a>, with <a href="https://www.raspberrypi.org/downloads/raspbian/">Raspbian Buster lite</a>. As an audio input device, I use the <a href="https://www.amazon.com/Sony-PlayStation-Camera-Bulk-Packaging-Pc/dp/B0072I2240">PS3 Eye Camera</a> (everyone suggests it, and I back this up!). Finally, I connect my speakers in the audio jack port of the RPi (info for when you configure the audio devices).</p>
+
+<p>On the software side, I use Python 3, the Google Assistant SDK and <a href="https://snowboy.kitt.ai">Snowboy</a> (I explain <a href="#hotword-activation">below</a> what Snowboy is and why I use it).</p>
+
+<p>To set this all up, just follow Google’s and Snowboy’s setup instructions. And now we are all set. Deep breath and let’s go…</p>
+
+<h2 id="google-assistant-service-is--deaf">Google Assistant Service is … deaf*</h2>
+
+<p>After installing the <em>Google Assistant (GA) SDK</em> and tried a few demos, I realized they have revoked the hotword wake-up function (or <em>Hands-free activation</em> as they call it), and instead they only provide a <em>push-to-talk</em> functionality. What a bummer…</p>
+<blockquote>
+  <p>Read more about the Google Assistant feature support <a href="https://developers.google.com/assistant/sdk/overview">here</a></p>
+</blockquote>
+
+<p>I didn’t give up though, all I had to do was to use some third-party hotword detection service to invoke the <em>push-to-talk</em>; then I’d be good to go implement my features!</p>
+
+<p>Well, at least the idea was right. In practice, it was quite a pain…</p>
+
+<h6 id="-technically-not-really-deaf-it-can-hear-you-if-you-poke-it-roll_eyes">* Technically, not really deaf. It can hear you if you poke it <img class="emoji" title=":roll_eyes:" alt=":roll_eyes:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f644.png" height="20" width="20">
+</h6>
+
+<h2 id="hotword-activation">Hotword activation</h2>
+<p>The quest to find a hotword detection service was easy. On the first search I bumped into <a href="https://snowboy.kitt.ai">Snowboy</a> and I stuck with it. It works great and lets you define your own hotword when training your model.</p>
+
+<p>I named mine <em>Joe</em>! It turns out this was not the wisest choice since it activates with words like “joke”, “hedgehog”, “George”, etc., but it’s fine for now. Feels like he wants to be part of our conversation every time he pops up, which is fun until it becomes annoying :)</p>
+
+<p>The setup is straightforward:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> ~
+git clone https://github.com/Kitt-AI/snowboy.git
+<span class="nb">cd </span>snowboy/swig/Python3
+make
+</code></pre></div></div>
+
+<p>They provide some demos on <code class="highlighter-rouge">snowboy/examples/Python3</code>. Everything ran perfectly fine, so then it was time to alter one of the demos and call the Google Assistant’s <em>push-to-talk</em>. I started getting the feeling that this will not be as simple as it sounds (oh boy, was I right…), so I started looking at how other people had gone on that.</p>
+
+<h2 id="diving-deep">Diving deep</h2>
+<p>One of the most comprehensive guides I found was this one: <a href="https://www.sigmdel.ca/michel/ha/rpi/voice_rec_02_en.html">Google Assistant with snowboy Hotword Recognition</a> (plus they provide scripts with things they have tried; big thanks!). The article is written in 2018 and it makes use of the <em>GA Service</em>, not the <em>GA Library</em>, as it is explained on <a href="https://www.sigmdel.ca/michel/ha/rpi/voice_rec_02_en.html#GA">step 6</a>. At the same step, they explain how to use <em>Snowboy</em> to invoke <em>push-to-talk</em>, however, the process of doing so is far more complex than what I was aiming for:</p>
+<ul>
+  <li>Call <em>Snowboy</em> using your hotword</li>
+  <li>Your query is recorded and saved on a <code class="highlighter-rouge">.wav</code> file</li>
+  <li>A <code class="highlighter-rouge">subprocess</code> is used to call <em>push-to-talk</em>, passing the <code class="highlighter-rouge">.wav</code> file as argument</li>
+  <li>The response from GA is also saved as a <code class="highlighter-rouge">.wav</code> file</li>
+  <li>Another <code class="highlighter-rouge">subprocess</code> is used to call <code class="highlighter-rouge">aplay</code> to play the response</li>
+</ul>
+
+<p>In general, I avoid using <code class="highlighter-rouge">subprocess</code> if possible, and this solution felt like an overkill. What was closer to my desire is described as a failure on the next step (<a href="https://www.sigmdel.ca/michel/ha/rpi/voice_rec_02_en.html#SnowGA">step 7</a>). In fact, it starts like “<em>Why use a sub process to invoke a Python script within a Python script?</em>”</p>
+
+<p>However, the problem they faced comes up a few lines later:</p>
+<blockquote>
+  <p><em>“Note that <code class="highlighter-rouge">pushtotalk.main</code> … never returns in <code class="highlighter-rouge">detectedCallback</code>. … Instead, the program exits without explanation.”</em></p>
+</blockquote>
+
+<p>Furthermore, they also state that the author of <em>GassistPi</em> recognized this as a Google issue. It is also mentioned that the support for <em>Snowboy</em> was removed from <em>GAssistPi</em> <em>“because of a problematic interaction with  <code class="highlighter-rouge">Portaudio</code>.”</em></p>
+
+<p>Well, now I had some work to do! :D</p>
+
+<h2 id="reuse-previous-knowledge">Reuse previous knowledge</h2>
+<p>Theory is good, but I needed to test what they have done for myself. Thus, I downloaded the provided scripts and started playing around. The first step is to store the <a href="https://www.sigmdel.ca/michel/ha/rpi/dnld/talkassist.py">talkassist.py</a> at the same location as the <code class="highlighter-rouge">pushtotalk.py</code>, and the <a href="https://www.sigmdel.ca/michel/ha/rpi/dnld/googlesamples-assistant-talkassist">googlesamples-assistant-talkassist</a> at the same location as the <code class="highlighter-rouge">googlesamples-assistant-pushtotalk</code>. The <code class="highlighter-rouge">talkassist.py</code> is a modified <code class="highlighter-rouge">pushtotalk.py</code> that overpasses waiting for key-press. Since they are both very similar, I will only use the term <strong><code class="highlighter-rouge">talkassist</code></strong> from now on.</p>
+
+<p>From the rest of the scripts, I only downloaded the scripts that invoke the assistant through a function call and not using subprocess (these are <a href="https://www.sigmdel.ca/michel/ha/rpi/dnld/sbdemo7.py">sbdemo7.py</a> and <a href="https://www.sigmdel.ca/michel/ha/rpi/dnld/sbdemo7e.py">sbdemo7e.py</a>). I placed these scripts in the <em>Snowboy</em>’s <em>examples</em> directory. They are both very similar since they are reworked versions of the original <code class="highlighter-rouge">demo4.py</code> of <em>Snowboy</em>, so I will only mention <code class="highlighter-rouge">sbdemo7.py</code> from now on.</p>
+
+<p>Initially, I had to modify the script before I start using it. First, it makes use of a package called <code class="highlighter-rouge">pixels</code> to handle the indication LEDs of the <a href="https://respeaker.io/6_mic_array/">ReSpeaker</a> mic array. Since I am using the <em>PS3 Eye cam</em> as a mic, I did not bother installing that package. Insted I just commented out any code that had to do with it. Next, I linked my trained <em>Snowboy</em> model and ran the script:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python sbdemo7.py
+Listening... Press Ctrl+C to <span class="nb">exit</span>
+</code></pre></div></div>
+<p>While it seemed to be working, when my <em>hotword</em> got detected this was the outcome:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>INFO:snowboy:Keyword 1 detected at <span class="nb">time</span>: 2019-12-07 23:15:55
+yes...Expression <span class="s1">'ret'</span> failed <span class="k">in</span> <span class="s1">'src/hostapi/alsa/pa_linux_alsa.c'</span>, line: 1736
+Expression <span class="s1">'AlsaOpen( &amp;alsaApi-&gt;baseHostApiRep, params, streamDir, &amp;self-&gt;pcm )'</span> failed <span class="k">in</span> <span class="s1">'src/hostapi/alsa/pa_linux_alsa.c'</span>, line: 1904
+Expression <span class="s1">'PaAlsaStreamComponent_Initialize( &amp;self-&gt;capture, alsaApi, inParams, StreamDirection_In, NULL != callback )'</span> failed <span class="k">in</span> <span class="s1">'src/hostapi/alsa/pa_linux_alsa.c'</span>, line: 2171
+Expression <span class="s1">'PaAlsaStream_Initialize( stream, alsaHostApi, inputParameters, outputParameters, sampleRate, framesPerBuffer, callback, streamFlags, userData )'</span> failed <span class="k">in</span> <span class="s1">'src/hostapi/alsa/pa_linux_alsa.c'</span>, line: 2840
+Traceback <span class="o">(</span>most recent call last<span class="o">)</span>:
+  File <span class="s2">"orig_sbdemo7.py"</span>, line 78, <span class="k">in</span> &lt;module&gt;
+    <span class="nv">sleep_time</span><span class="o">=</span>sleepTime<span class="o">)</span>
+  File <span class="s2">"/home/pi/snowboy/examples/Python3/snowboydecoder.py"</span>, line 221, <span class="k">in </span>start
+    callback<span class="o">()</span>
+  File <span class="s2">"orig_sbdemo7.py"</span>, line 68, <span class="k">in </span>detectedCallback
+    main<span class="o">()</span> <span class="c"># in googlesamples.assistant.grpc.talkassist</span>
+  File <span class="s2">"/home/pi/snowboy/examples/Python3/custom_assist.py"</span>, line 246, <span class="k">in </span>main
+    <span class="nv">flush_size</span><span class="o">=</span>audio_flush_size
+  File <span class="s2">"/home/pi/env/lib/python3.7/site-packages/googlesamples/assistant/grpc/audio_helpers.py"</span>, line 190, <span class="k">in </span>__init__
+    <span class="nv">blocksize</span><span class="o">=</span>int<span class="o">(</span>block_size/2<span class="o">)</span>,  <span class="c"># blocksize is in number of frames.</span>
+  File <span class="s2">"/home/pi/env/lib/python3.7/site-packages/sounddevice.py"</span>, line 1345, <span class="k">in </span>__init__
+    <span class="k">**</span>_remove_self<span class="o">(</span>locals<span class="o">()))</span>
+  File <span class="s2">"/home/pi/env/lib/python3.7/site-packages/sounddevice.py"</span>, line 861, <span class="k">in </span>__init__
+    <span class="s1">'Error opening {0}'</span>.format<span class="o">(</span>self.__class__.__name__<span class="o">))</span>
+  File <span class="s2">"/home/pi/env/lib/python3.7/site-packages/sounddevice.py"</span>, line 2653, <span class="k">in </span>_check
+    raise PortAudioError<span class="o">(</span>errormsg, err<span class="o">)</span>
+sounddevice.PortAudioError: Error opening RawStream: Device unavailable <span class="o">[</span>PaErrorCode <span class="nt">-9985</span><span class="o">]</span>
+
+</code></pre></div></div>
+<p>Searching about this problem led me to the GA SDK GitHub <a href="https://github.com/googlesamples/assistant-sdk-python/issues/219">issue #219</a>, which points to a fix on <a href="https://github.com/googlesamples/assistant-sdk-python/pull/228">issue #228</a>, which <a href="https://github.com/googlesamples/assistant-sdk-python/pull/228/commits/ec296e9a83fcb0ba6f22905b22e8546d98cfce43">reverts to shared audio stream</a>. However, this fix was already implemented in my downloaded version, so it had to be something else.</p>
+
+<p>Thinking about it logically, I realized that the GA tries to use a stream that is already being used. Suddenly, it became pretty clear that the stream used by <em>Snowboy</em> must remain open. For a moment it seemed like I have to dive deep into <em>Snowboy</em> to fix that. Luckily, by exploring how the <code class="highlighter-rouge">HotwordDetector</code> class works, and by looking better at the <code class="highlighter-rouge">sbdemo7.py</code> I realized what is wrong. In the <code class="highlighter-rouge">sbdemo7.py</code>, although they start the detector, they do not close it before invoking the GA. They only close it after GA has returned:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">detectedCallback</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">detectedSignal</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">snowboydecoder</span><span class="o">.</span><span class="n">play_audio_file</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">detectedSignal</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c"># pixels.listen()</span>
+        <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">detectedSignal</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'yes...'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">main</span><span class="p">()</span> <span class="c"># in googlesamples.assistant.grpc.talkassist</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">Listening... Press Ctrl+C to exit'</span><span class="p">)</span>
+
+<span class="n">detector</span> <span class="o">=</span> <span class="n">snowboydecoder</span><span class="o">.</span><span class="n">HotwordDetector</span><span class="p">(</span><span class="n">SnowboyModel</span><span class="p">,</span>
+										<span class="n">sensitivity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Listening... Press Ctrl+C to exit'</span><span class="p">)</span>
+
+<span class="c"># main loop</span>
+<span class="n">detector</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">detected_callback</span><span class="o">=</span><span class="n">detectedCallback</span><span class="p">,</span>
+               <span class="n">interrupt_check</span><span class="o">=</span><span class="n">interrupt_callback</span><span class="p">,</span>
+               <span class="n">sleep_time</span><span class="o">=</span><span class="n">sleepTime</span><span class="p">)</span>
+
+<span class="n">detector</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span> <span class="c"># Terminates after callback finished</span>
+</code></pre></div></div>
+<p>So, I added a line to terminate the detector before the assistant is called:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">detectedCallback</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">detectedSignal</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">snowboydecoder</span><span class="o">.</span><span class="n">play_audio_file</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">detectedSignal</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c"># pixels.listen()</span>
+        <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">detectedSignal</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'yes...'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">detector</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span> <span class="c"># Terminate before call pushtotalk.main</span>
+    <span class="n">main</span><span class="p">()</span> <span class="c"># in googlesamples.assistant.grpc.talkassist</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">Listening... Press Ctrl+C to exit'</span><span class="p">)</span>
+</code></pre></div></div>
+<p>When I ran it again, no error popped up… yay! However, I only got to ask a single question; then it stopped. The reason is that the <em>Google Assistant</em> (specifically <code class="highlighter-rouge">talkassist.main</code>) does not return properly and just exits. With this, we reach the point where, as described above, they agreed that this is an issue coming from the <em>Google Assistant SDK</em>.</p>
+
+<p>So, let’s see what we got here and what we can do about it.</p>
+
+<h2 id="getting-my-hands-dirty">Getting my hands dirty</h2>
+<p>To examine the reasons why the <code class="highlighter-rouge">talkassist.main()</code> does not return we have to see what is going on in the <code class="highlighter-rouge">talkassist.py</code>. But before we get there, I will describe how I got a big hint that would point me in the right direction and resulting in solving the problem in the long run.</p>
+
+<p>So, when I was asking a question (the only one I was allowed to ask before it stops), I noticed that longer answers were giving a warning message:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python sbdemo7.py
+Listening... Press Ctrl+C to <span class="nb">exit
+</span>INFO:snowboy:Keyword 1 detected at <span class="nb">time</span>: 2019-12-07 23:57:53
+yes...WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 4000<span class="o">)</span>
+WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 4000<span class="o">)</span>
+WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 4000<span class="o">)</span>
+WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 4000<span class="o">)</span>
+</code></pre></div></div>
+<p>Googling about it, I found on <a href="https://github.com/googlesamples/assistant-sdk-python/issues/12#issuecomment-299081964">issue #12</a> that you can set the argument <code class="highlighter-rouge">--audio-block-size</code> to some bigger value:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python <span class="nt">-m</span> googlesamples.assistant  <span class="nt">--audio-block-size</span><span class="o">=</span>4096
+</code></pre></div></div>
+<p>And of course we can find the argument on the definition of the
+<code class="highlighter-rouge">talkassist.main()</code>:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">api_endpoint</span><span class="p">,</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">project_id</span><span class="p">,</span>
+         <span class="n">device_model_id</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">device_config</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span>
+         <span class="n">input_audio_file</span><span class="p">,</span> <span class="n">output_audio_file</span><span class="p">,</span> <span class="n">audio_sample_rate</span><span class="p">,</span>
+         <span class="n">audio_sample_width</span><span class="p">,</span> <span class="n">audio_iter_size</span><span class="p">,</span> <span class="n">audio_flush_size</span><span class="p">,</span>
+         <span class="n">audio_block_size</span><span class="p">,</span>
+         <span class="n">grpc_deadline</span><span class="p">,</span> <span class="n">once</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</code></pre></div></div>
+<p>So, I thought I could change the invocation of <code class="highlighter-rouge">main()</code> in <code class="highlighter-rouge">sbdemo7.py</code> to <code class="highlighter-rouge">main(audio_block_size=4096)</code>. Long story short: it didn’t work.</p>
+
+<p>Looking closer to the <code class="highlighter-rouge">talkassist.main()</code> I could see a set of decorators on top of it, which could play a role on this weird behaviour:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@click.command</span><span class="p">()</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--api-endpoint'</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">ASSISTANT_API_ENDPOINT</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;api endpoint&gt;'</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Address of Google Assistant API service.'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--credentials'</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;credentials&gt;'</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">click</span><span class="o">.</span><span class="n">get_app_dir</span><span class="p">(</span><span class="s">'google-oauthlib-tool'</span><span class="p">),</span>
+                                   <span class="s">'credentials.json'</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Path to read OAuth2 credentials.'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--project-id'</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;project id&gt;'</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s">'Google Developer Project ID used for registration '</span>
+                    <span class="s">'if --device-id is not specified'</span><span class="p">))</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--device-model-id'</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;device model id&gt;'</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="p">((</span><span class="s">'Unique device model identifier, '</span>
+                     <span class="s">'if not specifed, it is read from --device-config'</span><span class="p">)))</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--device-id'</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;device id&gt;'</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="p">((</span><span class="s">'Unique registered device instance identifier, '</span>
+                     <span class="s">'if not specified, it is read from --device-config, '</span>
+                     <span class="s">'if no device_config found: a new device is registered '</span>
+                     <span class="s">'using a unique id and a new device config is saved'</span><span class="p">)))</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--device-config'</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;device config&gt;'</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                  <span class="n">click</span><span class="o">.</span><span class="n">get_app_dir</span><span class="p">(</span><span class="s">'googlesamples-assistant'</span><span class="p">),</span>
+                  <span class="s">'device_config.json'</span><span class="p">),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Path to save and restore the device configuration'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--lang'</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;language code&gt;'</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="s">'en-US'</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Language code of the Assistant'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--verbose'</span><span class="p">,</span> <span class="s">'-v'</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Verbose logging.'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--input-audio-file'</span><span class="p">,</span> <span class="s">'-i'</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;input file&gt;'</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Path to input audio file. '</span>
+              <span class="s">'If missing, uses audio capture'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--output-audio-file'</span><span class="p">,</span> <span class="s">'-o'</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;output file&gt;'</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Path to output audio file. '</span>
+              <span class="s">'If missing, uses audio playback'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--audio-sample-rate'</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="n">audio_helpers</span><span class="o">.</span><span class="n">DEFAULT_AUDIO_SAMPLE_RATE</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;audio sample rate&gt;'</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Audio sample rate in hertz.'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--audio-sample-width'</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="n">audio_helpers</span><span class="o">.</span><span class="n">DEFAULT_AUDIO_SAMPLE_WIDTH</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;audio sample width&gt;'</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Audio sample width in bytes.'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--audio-iter-size'</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="n">audio_helpers</span><span class="o">.</span><span class="n">DEFAULT_AUDIO_ITER_SIZE</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;audio iter size&gt;'</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Size of each read during audio stream iteration in bytes.'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--audio-block-size'</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="n">audio_helpers</span><span class="o">.</span><span class="n">DEFAULT_AUDIO_DEVICE_BLOCK_SIZE</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;audio block size&gt;'</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s">'Block size in bytes for each audio device '</span>
+                    <span class="s">'read and write operation.'</span><span class="p">))</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--audio-flush-size'</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="n">audio_helpers</span><span class="o">.</span><span class="n">DEFAULT_AUDIO_DEVICE_FLUSH_SIZE</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;audio flush size&gt;'</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s">'Size of silence data in bytes written '</span>
+                    <span class="s">'during flush operation'</span><span class="p">))</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--grpc-deadline'</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_GRPC_DEADLINE</span><span class="p">,</span>
+              <span class="n">metavar</span><span class="o">=</span><span class="s">'&lt;grpc deadline&gt;'</span><span class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'gRPC deadline in seconds'</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s">'--once'</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s">'Force termination after a single conversation.'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">api_endpoint</span><span class="p">,</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">project_id</span><span class="p">,</span>
+         <span class="n">device_model_id</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">device_config</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span>
+         <span class="n">input_audio_file</span><span class="p">,</span> <span class="n">output_audio_file</span><span class="p">,</span>
+         <span class="n">audio_sample_rate</span><span class="p">,</span> <span class="n">audio_sample_width</span><span class="p">,</span>
+         <span class="n">audio_iter_size</span><span class="p">,</span> <span class="n">audio_block_size</span><span class="p">,</span> <span class="n">audio_flush_size</span><span class="p">,</span>
+         <span class="n">grpc_deadline</span><span class="p">,</span> <span class="n">once</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</code></pre></div></div>
+<p>Prior to that I had no idea about the very existence of the <em>Click</em> package. From its <a href="https://click.palletsprojects.com/en/5.x/api/">API documentation</a>:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>click.command(name=None, cls=None, **attrs)
+	Creates a new 'Command' and uses the decorated function as callback.
+	This will also automatically attach all decorated 'option()'s and
+	'argument()'s as parameters to the command.
+</code></pre></div></div>
+<p>Hmm, so it forms the command with the decorators and it looks like an argument can only be overwritten by calling the function directly from the command line. Since I do not need to call it from the command line, I’d first try to remove the decorators completely and see what happens. Then, if that’s too optimistic, I’d come back to see if I can find any <code class="highlighter-rouge">click</code> options that allow <code class="highlighter-rouge">talkassist.main</code> to return normally.</p>
+
+<p>Thus, I copied all the default arguments on the decorators, in the definition of the function:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">api_endpoint</span><span class="o">=</span><span class="n">ASSISTANT_API_ENDPOINT</span><span class="p">,</span>
+        <span class="n">credentials</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">click</span><span class="o">.</span><span class="n">get_app_dir</span><span class="p">(</span><span class="s">'google-oauthlib-tool'</span><span class="p">),</span> <span class="s">'credentials.json'</span><span class="p">),</span>
+        <span class="n">device_config</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">click</span><span class="o">.</span><span class="n">get_app_dir</span><span class="p">(</span><span class="s">'googlesamples-assistant'</span><span class="p">),</span><span class="s">'device_config.json'</span><span class="p">),</span>
+        <span class="n">device_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">project_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">device_model_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">input_audio_file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">output_audio_file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">audio_sample_rate</span><span class="o">=</span><span class="n">audio_helpers</span><span class="o">.</span><span class="n">DEFAULT_AUDIO_SAMPLE_RATE</span><span class="p">,</span>
+        <span class="n">audio_sample_width</span><span class="o">=</span><span class="n">audio_helpers</span><span class="o">.</span><span class="n">DEFAULT_AUDIO_SAMPLE_WIDTH</span><span class="p">,</span>
+        <span class="n">audio_block_size</span><span class="o">=</span><span class="n">audio_helpers</span><span class="o">.</span><span class="n">DEFAULT_AUDIO_DEVICE_BLOCK_SIZE</span><span class="p">,</span>
+        <span class="n">audio_flush_size</span><span class="o">=</span><span class="n">audio_helpers</span><span class="o">.</span><span class="n">DEFAULT_AUDIO_DEVICE_FLUSH_SIZE</span><span class="p">,</span>
+        <span class="n">audio_iter_size</span><span class="o">=</span><span class="n">audio_helpers</span><span class="o">.</span><span class="n">DEFAULT_AUDIO_ITER_SIZE</span><span class="p">,</span>
+        <span class="n">lang</span><span class="o">=</span><span class="s">'en-US'</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+        <span class="n">once</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+        <span class="n">grpc_deadline</span><span class="o">=</span><span class="n">DEFAULT_GRPC_DEADLINE</span><span class="p">):</span>
+</code></pre></div></div>
+<p>Back to <code class="highlighter-rouge">sbdemo7.py</code> we have to add a while loop. Otherwise, when the assistant returns the program will finish and exit, but we need it to be there for us to detect more spoken enquiries. So:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># main loop</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">detector</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">detected_callback</span><span class="o">=</span><span class="n">detectedCallback</span><span class="p">,</span>
+               <span class="n">interrupt_check</span><span class="o">=</span><span class="n">interrupt_callback</span><span class="p">,</span>
+               <span class="n">sleep_time</span><span class="o">=</span><span class="n">sleepTime</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Test time:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python sbdemo7.py
+Listening... Press Ctrl+C to <span class="nb">exit
+</span>INFO:snowboy:Keyword 1 detected at <span class="nb">time</span>: 2019-12-08 18:22:53
+yes...WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 1600<span class="o">)</span>
+
+Listening... Press Ctrl+C to <span class="nb">exit
+</span>INFO:snowboy:Keyword 1 detected at <span class="nb">time</span>: 2019-12-08 18:23:03
+yes...WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 4000<span class="o">)</span>
+WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 4000<span class="o">)</span>
+WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 4000<span class="o">)</span>
+WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 4000<span class="o">)</span>
+WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 4000<span class="o">)</span>
+
+Listening... Press Ctrl+C to <span class="nb">exit
+</span>INFO:snowboy:Keyword 1 detected at <span class="nb">time</span>: 2019-12-08 18:23:17
+yes...WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 1600<span class="o">)</span>
+WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 1600<span class="o">)</span>
+WARNING:root:SoundDeviceStream write underflow <span class="o">(</span>size: 1600<span class="o">)</span>
+</code></pre></div></div>
+<p>IT WORKED!!! <img class="emoji" title=":sob:" alt=":sob:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f62d.png" height="20" width="20"> *</p>
+
+<h6 id="-that-was-my-last-shot-before-i-give-up-for-the-night-it-was-330-am-with-my-girlfriend-already-pissed-off-of-me-shouting-hey-joe-all-night-while-shes-trying-to-sleep-some-of-you-will-understand">* That was my last shot before I give up for the night. It was 3:30 am, with my girlfriend already pissed off of me shouting “Hey Joe!” all night, while she’s trying to sleep. Some of you will understand!</h6>
+
+<h2 id="final-touch">Final touch</h2>
+
+<p>To make things easier, my plan for now is to have the google sample code available in any directory I want. To achieve this I made a copy of the <code class="highlighter-rouge">talkassist.py</code> and named it <code class="highlighter-rouge">custom_assist.py</code>. I placed it in the <em>Snowboy</em>’s example directory (<code class="highlighter-rouge">snowboy/examples/Python3/</code>), and thus I also had to change part of the imports, from:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">assistant_helpers</span><span class="p">,</span>
+        <span class="n">audio_helpers</span><span class="p">,</span>
+        <span class="n">device_helpers</span>
+    <span class="p">)</span>
+</code></pre></div></div>
+<p>to:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">googlesamples.assistant.grpc</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">assistant_helpers</span><span class="p">,</span>
+        <span class="n">audio_helpers</span><span class="p">,</span>
+        <span class="n">device_helpers</span>
+    <span class="p">)</span>
+</code></pre></div></div>
+<p>I also cleaned the file from unnecessary code that was not expected to be used yet (shown as commented):</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c"># @device_handler.command('action.devices.commands.OnOff')</span>
+    <span class="c"># def onoff(on):</span>
+    <span class="c">#    if on:</span>
+    <span class="c">#        logging.info('Turning device on')</span>
+    <span class="c">#    else:</span>
+    <span class="c">#        logging.info('Turning device off')</span>
+
+    <span class="k">with</span> <span class="n">SampleAssistant</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">device_model_id</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span>
+                         <span class="n">conversation_stream</span><span class="p">,</span>
+                         <span class="n">grpc_channel</span><span class="p">,</span> <span class="n">grpc_deadline</span><span class="p">,</span>
+                         <span class="n">device_handler</span><span class="p">)</span> <span class="k">as</span> <span class="n">assistant</span><span class="p">:</span>
+        <span class="c"># If file arguments are supplied:</span>
+        <span class="c"># exit after the first turn of the conversation.</span>
+        <span class="c"># if input_audio_file or output_audio_file:</span>
+        <span class="c">#    assistant.assist()</span>
+        <span class="c">#    return</span>
+
+        <span class="k">while</span> <span class="n">assistant</span><span class="o">.</span><span class="n">assist</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">once</span><span class="p">:</span>
+                <span class="k">break</span>
+</code></pre></div></div>
+
+<h2 id="summary">Summary</h2>
+<p>In this post, I described how I solved the lack of voice activation of the new <em>Google Assistant SDK</em>. I did that using <em>Snowboy</em> for hotword detection, an approach that more people have tried without success. In short, the main fixes were two:</p>
+<ol>
+  <li>Removing the <code class="highlighter-rouge">@click</code> decorators from the Google sample code to allow it to be used as a normal function.</li>
+  <li>Closing the audio stream used by <em>Snowboy</em>, before invoking the Google assistant.</li>
+</ol>
+
+<p>Follow these steps to make it work for yourself:</p>
+<ol>
+  <li>Make sure your setup is as I described in the <a href="#setup">Setup</a> paragraph
+    <ul>
+      <li>Install the <a href="https://developers.google.com/assistant/sdk/overview"><em>Google Assistant Service</em></a>
+</li>
+      <li>Install <a href="https://snowboy.kitt.ai"><em>Snowboy</em></a>, and train/configure your own hotword model</li>
+      <li>Do the appropriate tests to ensure your mic and speakers are functional and configured correctly</li>
+    </ul>
+  </li>
+  <li>Download my corrected demo version <a href="https://drive.google.com/file/d/1P71b6gsRvMl9gPqyu7dceMPmwudojvW9/view?usp">demo_assist.py</a>, and place it in <code class="highlighter-rouge">snowboy/examples/Python3</code>
+</li>
+  <li>Download my corrected version of the Google Assistant <em>push-to-talk</em> <a href="https://drive.google.com/file/d/1RmIGO3dfL6lZ4cC7Xwo_lm8MCdH-WYMe/view?usp">call_assist.py</a>, and also place it in <code class="highlighter-rouge">snowboy/examples/Python3</code>
+</li>
+  <li>Run <code class="highlighter-rouge">$ python demo_assist.py</code>
+</li>
+  <li>Enjoy chatting with your new assistant :)</li>
+</ol>
+
+<h4 id="troubleshooting">Troubleshooting</h4>
+<p>If you get the following error:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Traceback (most recent call last):
+  File "demo_assist.py", line 4, in &lt;module&gt;
+    import snowboydecoder
+  File "/home/pi/snowboy/examples/Python3/snowboydecoder.py", line 5, in &lt;module&gt;
+    from . import snowboydetect
+ImportError: attempted relative import with no known parent package
+</code></pre></div></div>
+<p>Simply open the <code class="highlighter-rouge">/home/pi/snowboy/examples/Python3/snowboydecoder.py</code> and replace <code class="highlighter-rouge">from . import snowboydetect</code> with <code class="highlighter-rouge">import snowboydetect</code>.</p>
+
+<p>I hope you found this post helpful. Let me know below if you think I missed anything, and I’d love if you share any cool projects you created on it :D</p>
+
+<p>I’m out for creating mine now. Cheers!</p>
+
+
+
+<div class="pt-5">
+  
+</div>
+
+</div>
+  </main>
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>Tasos Glrs</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+<a class="social mx-1" href="mailto:glaros@outlook.com" style="color: #6c757d" onmouseover="this.style.color='#db4437'" onmouseout="this.style.color='#6c757d'">
+      <i class="fas fa-envelope fa-1x"></i>
+    </a><a class="social mx-1" href="https://www.github.com/glrs" style="color: #6c757d" onmouseover="this.style.color='#333333'" onmouseout="this.style.color='#6c757d'">
+      <i class="fab fa-github fa-1x"></i>
+    </a><a class="social mx-1" href="https://stackoverflow.com/u/4618605/tasosglrs" style="color: #6c757d" onmouseover="this.style.color='#f48024'" onmouseout="this.style.color='#6c757d'">
+      <i class="fab fa-stack-overflow fa-1x"></i>
+    </a><a class="social mx-1" href="https://www.twitter.com/anasglar" style="color: #6c757d" onmouseover="this.style.color='#2d2b2a'" onmouseout="this.style.color='#6c757d'">
+      <i class="fa-brands fa-x-twitter fa-1x"></i>
+    </a>
+
+</div>
+<small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+
+</footer>
+
+  
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+
+</html>

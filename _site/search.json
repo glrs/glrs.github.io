@@ -1,0 +1,35 @@
+[
+  
+    {
+      "title"    : "My Adventure into Game Development with chatGPT",
+      "category" : "",
+      "tags"     : "chat-gpt, game-dev",
+      "url"      : "/blog/giggleland",
+      "date"     : "2023-05-21 00:00:00 +0200"
+    } ,
+  
+    {
+      "title"    : "Google Assistant SDK with Snowboy on Raspberry Pi",
+      "category" : "",
+      "tags"     : "raspberry-pi, home-automation",
+      "url"      : "/blog/ga_sdk-voice_rec-RasPi",
+      "date"     : "2019-12-17 00:00:00 +0100"
+    } ,
+  
+    {
+      "title"    : "Jupyter notebook for personal online access",
+      "category" : "",
+      "tags"     : "guide, jupyter-notebook",
+      "url"      : "/blog/jupyter-online",
+      "date"     : "2018-04-11 00:00:00 +0200"
+    } ,
+  
+    {
+      "title"    : "Hello GitHub world!",
+      "category" : "",
+      "tags"     : "hello-world",
+      "url"      : "/blog/Hello-World",
+      "date"     : "2018-04-10 00:00:00 +0200"
+    } 
+  
+]

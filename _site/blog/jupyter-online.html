@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  
+  
+  
+
+  
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Jupyter notebook for personal online access">
+  <meta property="og:description" content="Here I dispose Projects / Solutions / Ideas">
+  <meta property="og:image" content="img/my_avatar_icon.png">
+
+  <title>Jupyter notebook for personal online access</title>
+  <meta name="description" content="Here I dispose Projects / Solutions / Ideas">
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Theme style -->
+  <script src="/assets/js/theme.js"></script>
+
+  <!-- Font Awesome CDN -->
+  <!--
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
+  -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+</head>
+
+<body class="h-100 d-flex flex-column">
+
+  <main class="flex-shrink-0 container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-themed">
+
+  <a class="navbar-brand" href="/"><h5><b>playground</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-1x fa-bars text-themed"></i>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/apps/">Dev / Apps</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+      <span id="theme-toggler" class="nav-item nav-link" role="button" onclick="toggleTheme()"></span>
+    </div>
+  </div>
+
+</nav>
+    <div class="col-lg-10 mx-auto mt-5 markdown-body">
+  <h1><b>Jupyter notebook for personal online access</b></h1>
+
+<p class="post-metadata text-muted">
+  11 April 2018 -  
+  <b>12 mins read time</b>
+
+  <br>Tags: 
+    
+    <a class="text-decoration-none no-underline" href="/blog/tags#guide">
+      <span class="tag badge badge-pill text-primary border border-primary">guide</span>
+    </a>
+    
+    <a class="text-decoration-none no-underline" href="/blog/tags#jupyter-notebook">
+      <span class="tag badge badge-pill text-primary border border-primary">jupyter-notebook</span>
+    </a>
+    </p>
+
+<p>This is a guide of how to setup a Jupyter Notebook for remote access. Not a novelty whatsoever, just a nice way to work on your projects (especially if you have a strong machine sitting somewhere), while you are wandering around carrying only your incapable laptop. As a ML/DL enthusiast I run TensorFlow in a fairly powerful remote server, so I want to exploit the most out of it, with the convenience of the Jupyter Notebook.</p>
+
+<p>We need:</p>
+<ul>
+  <li>an Ubuntu server<a href="#notes">*</a> with Internet access &amp; sudo privileges</li>
+  <li>Apache2 server</li>
+  <li>Anaconda</li>
+</ul>
+
+<p>Once everything is set up, we should be able to access the Jupyter Notebook on a web browser through the web.</p>
+
+<p><strong>Disclaimer:</strong> This demonstration is about a personal, single-user notebook that you will be able to access remotely. This is different from a multi-user server setup. If you want to setup a server for multi-user access you can refer to this <a href="https://github.com/jupyterhub/jupyterhub">GitHub Repo</a>.</p>
+
+<p><strong><a href="#lets-start">Jump straight to the guide! (Let’s Start)</a></strong></p>
+
+<h2 id="why-apache">Why Apache?</h2>
+<p>You probably know that Jupyter Notebook comes with its own server, so why not using this server straight away instead of Apache (or any other server)? Well, there are some reasons not to do so. Most of the times your server machine is behind a firewall (and if not, it should be) and this makes it tricky, tedious and insecure to open new ports, especially if you are not very familiar with networking and security. One could say that you can use already opened ports, like port 80. However, if you want to run a web server simultaneously (which I usually do) you have to reconsider it. Also, Apache is on the market for many-many years, maintaining a good reputation as web servers are concerned. Thus, I trust it way more than I would trust a recent server intended to serve the Jupyter Notebook on localhost. For sure they are doing a very good job in optimizing the security on Jupyter server, as you can read <a href="http://jupyter-notebook.readthedocs.io/en/latest/security.html">here</a> …but still.</p>
+
+<p>So, why Apache and not another famous server like NGINX? This is up to you! Apache is my own server of choice, because I am more familiar with it and I want to do things faster. But as I said, you should feel free to use the web server of your choice. Here I am using Apache2 to proxy the Jupyter Notebook server.</p>
+
+<h2 id="why-anaconda">Why Anaconda?</h2>
+<p>Anaconda packs together many goodies (Python, Jupyter Notebook, conda, etc) and also prevents the user from messing too much up with the system. You can read more about Anaconda’s advantages it in this <a href="https://www.reddit.com/r/Python/comments/3t23vv/what_advantages_are_there_of_using_anaconda/">reddit thread</a>.</p>
+
+<h2 id="lets-start">Let’s Start!</h2>
+<h3 id="installations">Installations<a href="#notes">*</a></h3>
+<p>Open your terminal (or ssh session) and let’s get started!</p>
+
+<p>First of all, make sure that your system is updated</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get update		<span class="c"># Fetches the list of available updates</span>
+<span class="nb">sudo </span>apt-get upgrade		<span class="c"># Strictly upgrades the current packages</span>
+<span class="nb">sudo </span>apt-get dist-upgrade	<span class="c"># Installs updates (new ones)</span>
+<span class="nb">sudo </span>reboot			<span class="c"># Restart</span>
+<span class="nb">sudo </span>apt-get autoremove		<span class="c"># Remove packages system no longer needs</span>
+</code></pre></div></div>
+
+<p>For upgrading from an older Ubuntu version (recommended) do the following.
+WARNING! Before you proceed backup your data and/or read this <a href="http://askubuntu.com/questions/110477/how-do-i-upgrade-to-a-newer-version-of-ubuntu">askubuntu thread</a>.</p>
+
+<p>(If you are connected via SSH, do the upgrade in a TMUX session: <code class="highlighter-rouge">tmux new –s upgrade_session</code>)</p>
+
+<p>Proceed with the upgrade</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span><span class="k">do</span><span class="nt">-release-upgrade</span>
+</code></pre></div></div>
+
+<p>If for some reason after the distro upgrade you see a message like:</p>
+
+<p><code class="highlighter-rouge">N: Ignoring file ‘50unattended-upgrades.ucf-old’ in directory ‘/etc/apt/apt.conf.d/’ as it has an invalid filename extension</code></p>
+
+<p>then simply remove the file.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>rm /etc/apt/apt.conf.d/50unattended-upgrades.ucf-old
+</code></pre></div></div>
+<p>Read about this issue in this <a href="http://askubuntu.com/questions/829370/n-ignoring-file-50unattended-upgrades-ucf-dist-in-directory-etc-apt-apt-con">askubuntu thread</a>.</p>
+
+<h3 id="-apache">&gt; Apache</h3>
+<p>Next step is to install Apache in our system. This should be as easy as:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt install apache2
+</code></pre></div></div>
+
+<p>To verify that the installation was successful type: <code class="highlighter-rouge">service apache2 status</code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ● apache2.service - LSB: Apache2 web server
+    Loaded: loaded <span class="o">(</span>/etc/init.d/apache2<span class="p">;</span> bad<span class="p">;</span> vendor preset: enabled<span class="o">)</span>
+   Drop-In: /lib/systemd/system/apache2.service.d
+            └─apache2-systemd.conf
+    Active: active <span class="o">(</span>running<span class="o">)</span> since Wed 2016-12-21 15:25:01 UTC<span class="p">;</span> 15min ago
+      Docs: man:systemd-sysv-generator<span class="o">(</span>8<span class="o">)</span>
+    CGroup: /system.slice/apache2.service
+            ├─2558 /usr/sbin/apache2 <span class="nt">-k</span> start
+            ├─2561 /usr/sbin/apache2 <span class="nt">-k</span> start
+            └─2562 /usr/sbin/apache2 <span class="nt">-k</span> start
+Dec 21 15:24:59 test-install systemd[1]: Starting LSB: Apache2 web server...
+Dec 21 15:24:59 test-install apache2[2522]:  <span class="k">*</span> Starting Apache httpd web server apache2
+Dec 21 15:25:01 test-install apache2[2522]:  <span class="k">*</span> Dec 21 15:25:01 test-install systemd[1]: Started LSB: Apache2 web server.
+</code></pre></div></div>
+
+<p>More info for <a href="https://help.ubuntu.com/lts/serverguide/httpd.html">Apache2 here</a>.</p>
+
+<h3 id="-anaconda">&gt; Anaconda</h3>
+<p>Then we are ready, to download and install Anaconda. Go to <a href="https://www.continuum.io/downloads">https://www.continuum.io/downloads</a> and download Anaconda with Python3.6 for your system. Or, as I like to do, find the desired distribution in the <a href="https://repo.continuum.io/archive/">https://repo.continuum.io/archive/</a> and download with wget (or curl).</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://repo.continuum.io/archive/AnacondaX-X.X.X-Linux-x86_64.sh
+</code></pre></div></div>
+
+<p>Then run the script you just downloaded to begin the installation, and follow the instructions (if unsure, just accept the defaults).</p>
+
+<p>NOTE: I recommend you to select adding the install location to PATH when you asked.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash AnacondaX-X.X.X-Linux-x86_64.sh
+</code></pre></div></div>
+<p>For more information about the Anaconda installation, check the <a href="https://docs.continuum.io/anaconda/install#linux-install">documentation here</a></p>
+
+<p>Afterwards, you need to close your current terminal and open a new one for the changes to take effect.</p>
+
+<p>To verify that the installation was successful, type:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>jupyter notebook
+</code></pre></div></div>
+<p>If you get any messages about JavaScript requirements, just ignore it for now.</p>
+
+<p>It is time to install the <code class="highlighter-rouge">setuptools</code> package using <code class="highlighter-rouge">pip</code>. To find out which <code class="highlighter-rouge">pip</code> to use run the following.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>which pip
+pip <span class="nt">--version</span>
+</code></pre></div></div>
+<p>This <code class="highlighter-rouge">pip</code> alias should point to the Anaconda’s <code class="highlighter-rouge">pip3</code> (if you chose the suggested Anaconda with the Python3). If not, then try the above commands typing <code class="highlighter-rouge">pip3</code> instead of <code class="highlighter-rouge">pip</code>. This is for you to know which pip to use for installing stuff that are visible by Anaconda.</p>
+
+<p>Now install the latest setuptools (using the appropriate <code class="highlighter-rouge">pip</code>)</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install <span class="nt">-U</span> pip setuptools
+</code></pre></div></div>
+
+<h2 id="configuration">Configuration</h2>
+<h3 id="-configure-jupyter">&gt; Configure Jupyter</h3>
+<p>Now it’s time to configure the Apache and Jupyter Notebook to make them work together. First, we need to create a configuration file for Jupyter</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>jupyter notebook <span class="nt">--generate-config</span>
+</code></pre></div></div>
+<p>This should create a folder (named <code class="highlighter-rouge">.jupyter</code>) in the home directory. This folder contains the configuration file named <code class="highlighter-rouge">jupyter_notebook_config.py</code>. Open it with your text editor (I use vim) and write the followings at the beginning of the file (you can also uncomment and edit the respective fields already existing in the document).</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim .jupyter/jupyter_notebook_config.py
+</code></pre></div></div>
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Configuration file for jupyter-notebook.
+</span><span class="n">c</span> = <span class="n">get_config</span>()
+<span class="n">c</span>.<span class="n">NotebookApp</span>.<span class="n">ip</span> = <span class="s1">'localhost'</span>
+<span class="n">c</span>.<span class="n">NotebookApp</span>.<span class="n">port</span> = <span class="m">8888</span>  <span class="c"># or other port number of your preference
+</span><span class="n">c</span>.<span class="n">NotebookApp</span>.<span class="n">base_url</span> = <span class="s1">'/jupyter'</span>  <span class="c"># or whatever you like to have as url
+</span><span class="n">c</span>.<span class="n">NotebookApp</span>.<span class="n">open_browser</span> = <span class="n">False</span>
+</code></pre></div></div>
+<p><strong>Note:</strong> If you got any messages about JavaScript requirements when running <code class="highlighter-rouge">jupyter notebook</code>,  then the last option (<code class="highlighter-rouge">open_browser = False</code>) should prevent them. What is happening is that Jupyter by default tries to open a browser (which in my case is impossible since I run a command line only server). By setting this option to False, no browser is invoked, so no more JavaScript warnings will pop up.</p>
+
+<p>What we have done until now, is to configure the Jupyter Notebook to run as a server at localhost on the port 8888, and under the url <code class="highlighter-rouge">http://localhost:8888/jupyter</code> (or whatever you configured it to). Note that it is not necessary to specify a base_url, however you will need it if you run other stuff (e.g. a web page) under the root folder.</p>
+
+<h3 id="-configure-apache">&gt; Configure Apache</h3>
+<p>The first step when configuring Apache is to make sure that we can have public access to it. Make sure that the port 80 and 443 (HTTP and HTTPS) of your system are opened and not blocked by the firewall.</p>
+
+<p>If you have a VM server on a high-end Platform (e.g. Google Cloud), then allowing HTTP access should be as simple as checking a box (e.g. “Allow HTTP traffic”). For more general info about opening HTTP ports take a look at <a href="https://www.cyberciti.biz/tips/linux-iptables-11-how-to-block-or-open-httpweb-service.html">https://www.cyberciti.biz/tips/linux-iptables-11-how-to-block-or-open-httpweb-service.html</a>.</p>
+
+<p>By default there should be an <code class="highlighter-rouge">index.html</code> file in the <code class="highlighter-rouge">/var/www/html/</code> folder. If not, just create a dummy index file with some text in it. Then try to visit your server outside the local network (use its global IP address). At this point I assume you succeeded to connect, and we move on.</p>
+
+<p>Next step would be to configure Apache to reverse proxy the location we created earlier for the Jupyter Notebook server. Open the Apache’s configuration file <code class="highlighter-rouge">apache2.conf</code> under <code class="highlighter-rouge">/etc/apache2/</code> (default) directory. Note that you might need administrative privileges for being able to edit this file.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>vim /etc/apache2/apache2.conf
+</code></pre></div></div>
+<p>Go at the end of the file and add the following:</p>
+<div class="language-apache highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Allow Jupyter through apache2</span>
+<span class="p">&lt;</span><span class="nl">Location</span><span class="sr"> /jupyter</span><span class="p">&gt;
+</span><span class="nc">ProxyPass</span>        http://localhost:8888/jupyter
+<span class="nc">ProxyPassReverse</span> http://localhost:8888/jupyter
+<span class="nc">RequestHeader</span> <span class="ss">set</span> Origin "http://localhost:8888"
+<span class="p">&lt;/</span><span class="nl">Location</span><span class="p">&gt;
+</span>
+<span class="p">&lt;</span><span class="nl">Location</span><span class="sr"> /jupyter/api/kernels/</span><span class="p">&gt;
+</span><span class="nc">ProxyPass</span>        ws://localhost:8888/jupyter/api/kernels/
+<span class="nc">ProxyPassReverse</span> ws://localhost:8888/jupyter/api/kernels/
+<span class="p">&lt;/</span><span class="nl">Location</span><span class="p">&gt;
+</span></code></pre></div></div>
+<p>Of course if you have chosen a different port or a different base URL in the Jupyter config file, you have to change them accordingly to reflect your preferences. On the second part we simply reverse proxying the Jupyter Kernel WebSockets too (it is necessary). For more on this and the Jupyter kernels take a look at <a href="http://jupyter-kernel-gateway.readthedocs.io/en/latest/">http://jupyter-kernel-gateway.readthedocs.io/en/latest/</a>.</p>
+
+<p>The last piece on the puzzle that will make the whole setup work, is to enable some of the Apache modules. Go forward and type the next commands on your terminal.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>a2enmod proxy		<span class="c"># Enable proxy module</span>
+<span class="nb">sudo </span>a2enmod proxy_http		<span class="c"># Enable proxy http module</span>
+<span class="nb">sudo </span>a2enmod proxy_wstunnel	<span class="c"># Enable proxy websocket tunnel</span>
+<span class="nb">sudo </span>a2enmod headers		<span class="c"># Enable headers (for RequestHeader directive)</span>
+<span class="nb">sudo </span>service apache2 restart	<span class="c"># Restart Apache</span>
+</code></pre></div></div>
+<p>I figured out most of these settings by reading on this <a href="http://stackoverflow.com/a/28819231/4618605">answer on Stackoverflow</a>.</p>
+
+<p>By the time that Apache restarts you should be able to access your Jupyter Notebook online!</p>
+
+<p><strong>Recommendation</strong>: Open a new TMUX session to run your Jupyter server in it and give it a relevant name: <code class="highlighter-rouge">tmux new -s JupyterNotebookServerSession</code></p>
+
+<p>Start the Jupyter Notebook</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>jupyter notebook
+</code></pre></div></div>
+<p>Now visit your server from a remote browser, (e.g. <code class="highlighter-rouge">http://&lt;your-ip-address&gt;/jupyter</code>) , et voilà!!! Enjoy your very own notebook from everywhere!</p>
+
+<h2 id="security">Security!</h2>
+<p>Being online means being exposed. Here I will describe only the security basics (a.k.a. how to add password to your notebook), but I will provide some resources on how to upgrade your notebook’s/server’s security even further.</p>
+
+<p>First of all, we need to create a hashed password. You can very easily do this by running Python on your terminal (make sure it is the Anaconda installed Python) and typing the following:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">notebook.auth</span> <span class="kn">import</span> <span class="n">passwd</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">passwd</span><span class="p">()</span>	<span class="c"># You will be prompted to enter your password</span>
+    
+	<span class="n">Enter</span> <span class="n">password</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">YOUR</span><span class="o">-</span><span class="n">PASSWORD</span><span class="o">&gt;</span>
+	<span class="n">Verify</span> <span class="n">password</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">YOUR</span><span class="o">-</span><span class="n">PASSWORD</span><span class="o">&gt;</span>
+	<span class="err">‘</span><span class="n">sha1</span><span class="p">:</span><span class="o">&lt;</span><span class="n">HASHED</span><span class="o">-</span><span class="n">SALT</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;</span><span class="n">HASHED</span><span class="o">-</span><span class="n">PASSWORD</span><span class="o">&gt;</span><span class="err">’</span>
+</code></pre></div></div>
+
+<p>After typing and verifying your password, a sha1 string which contains your hashed password and the hashed salt will appear. Make sure you keep that somewhere that you can find it later. Now open the Jupyter’s config file and add the next line:</p>
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c</span>.<span class="n">NotebookApp</span>.<span class="n">password</span> = <span class="n">u</span><span class="s1">'sha1:&lt;hashed-salt&gt;:&lt;hashed-password&gt;'</span>
+</code></pre></div></div>
+<p>Replace the placeholder with the SHA1 string you retained earlier. Save. Attach to your TMUX session (if you use one) and restart your Jupyter Notebook. Refresh your notepad on your browser, and you should be prompt to add your password to login. 1st level of security done!</p>
+
+<h2 id="more-security">More security</h2>
+<p>Complete Jupyter security documentation: <a href="http://jupyter-notebook.readthedocs.io/en/stable/public_server.html">http://jupyter-notebook.readthedocs.io/en/stable/public_server.html</a></p>
+
+<p>Secure Apache: <a href="https://geekflare.com/10-best-practices-to-secure-and-harden-your-apache-web-server/">https://geekflare.com/10-best-practices-to-secure-and-harden-your-apache-web-server/</a></p>
+
+<h2 id="notes">Notes</h2>
+<ol>
+  <li>
+    <p>I built this guide on Ubuntu 16.04.1 LTS. However, the process should be very similar for users with another version or other Linux distros. Just follow the guidelines for installing the various software on your system. For Mac users the process should also be kind of similar. Windows users should use this guide as a rough guide and swing a bit around with the different ways to install and setup stuff.</p>
+  </li>
+  <li>
+    <p>I assume you run Ubuntu 16.04.</p>
+  </li>
+</ol>
+
+
+
+<div class="pt-5">
+  
+</div>
+
+</div>
+  </main>
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>Tasos Glrs</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center"><a class="social mx-1"  href="mailto:glaros@outlook.com"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#db4437'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fas fa-envelope fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.github.com/glrs"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#333333'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-github fa-1x"></i>
+    </a><a class="social mx-1"  href="https://stackoverflow.com/u/4618605/tasosglrs"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#f48024'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-stack-overflow fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.twitter.com/anasglar"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#2d2b2a'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fa-brands fa-x-twitter fa-1x"></i>
+    </a>
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+
+</footer>
+
+  
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+
+</html>
