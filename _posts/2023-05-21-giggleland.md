@@ -5,7 +5,7 @@ tags: chat-gpt game-dev
 style: fill
 color: secondary
 description:
-published: True
+published: false
 ---
 
 As a curious individual with a knack for exploring the unknown, I have always found game development intriguing. However, my experience was limited to say the least, and the complex world of coding games seemed like a mountain too high to climb. But this year, I decided to take the plunge, and with a little help from an AI language model developed by OpenAI - chatGPT, I've managed to accomplish what seemed impossible at first.

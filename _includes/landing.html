@@ -6,12 +6,18 @@
       <div id="dummy"></div>
       <div id="element">
         <div class="circle-image-container">
-          <img src="{{ site.author.image }}" alt="{{ site.title }}" class="circle-image wow animated zoomIn" data-wow-delay=".1s">
+          <img
+            src="{{ site.author.light_image | default: site.author.image | relative_url }}"
+            data-light-src="{{ site.author.light_image | default: site.author.image | relative_url }}"
+            data-dark-src="{{ site.author.dark_image | default: site.author.image | relative_url }}"
+            alt="{{ site.author.name }} avatar"
+            class="circle-image"
+          >
         </div>
       </div>
     </div>
 
-    <p class="text-muted wow animated slideInUp" data-wow-delay=".15s">{{ site.description }}</p>
+    <p class="text-muted">{{ site.description }}</p>
 
   </div>
 </div>

@@ -31,6 +31,10 @@
 
         {%- endfor -%}
 
+        {%- if html_page.title == nil or html_page.title == "" -%}
+          {%- assign exclude = true -%}
+        {%- endif -%}
+
         {%- unless exclude -%}
           {%- assign filtered_pages = filtered_pages | push: html_page -%}
         {%- endunless -%}

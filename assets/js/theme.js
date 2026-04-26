@@ -47,5 +47,16 @@ function getTheme() {
 
 function setTheme(value) {
   document.documentElement.setAttribute(THEME_ATTR, value);
+  setImageSource(value);
 }
 
+function setImageSource(theme) {
+  if (!document.body) return;
+
+  document.querySelectorAll("[data-light-src][data-dark-src]").forEach((image) => {
+    const source = theme === themes.DARK ? image.dataset.darkSrc : image.dataset.lightSrc;
+    if (source && image.getAttribute("src") !== source) {
+      image.setAttribute("src", source);
+    }
+  });
+}
