@@ -1,0 +1,19 @@
+---
+---
+@import "portfolYOU";
+
+
+.circle-image-container {
+    position: relative;
+    display: inline-block;
+    border-radius: 50%;
+    overflow: hidden;
+    padding: 5px;
+  }
+  
+  [data-theme="dark"] .circle-image-container {
+    background: radial-gradient(circle at center,
+    rgba(245, 245, 245, 0.75) 20%,
+    rgba(143, 143, 143, 0.55) 50%,
+    rgba(22, 22, 22, 0.3) 71%);
+}
