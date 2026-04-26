@@ -2,7 +2,7 @@
 title               : glrs.dev
 description         : >-
                       Things I build, from software to woodworking.
-tagline             : Things I build...<br>from software to woodworking.
+tagline             : Things I build...<br>...from software to woodworking
 url                 : "https://glrs.github.io"
 baseurl             : ""                     # Change to empty quotes if you are hosting your site at <your-username>.github.io directly
 repository          : glrs/glrs.github.io    # Change to <your-username>/<your-username>.github.io (or remove it if you don't need remote projects)
