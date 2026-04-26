@@ -6,6 +6,9 @@ style: fill
 color: primary
 description:
 published: True
+disqus_url: https://glrs.github.io/2019-12-17-ga_sdk-voice_rec-RasPi/
+redirect_from:
+  - /2019-12-17-ga_sdk-voice_rec-RasPi/
 ---
 
 Here I explain how I solved several issues I faced setting up _Google Assistant SDK_ with hotword activation on Raspberry Pi. For the hotword I used _Snowboy_, however, I had to do some work to make it work with Google Assistant. As it turned out, some of the issues I faced are known problems, discussed in several online communities. So if you are facing some of those issues, this article is for you!

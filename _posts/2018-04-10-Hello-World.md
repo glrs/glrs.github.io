@@ -5,6 +5,9 @@ tags: hello-world
 style: fill
 color: secondary
 description:
+disqus_url: https://glrs.github.io/2018-04-10-Hello-World/
+redirect_from:
+  - /2018-04-10-Hello-World/
 ---
 
 This is my very first post. After months (or maybe years) of procrastination I decided to make an effort and bring my GitHub page to life. Enjoy!

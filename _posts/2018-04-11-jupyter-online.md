@@ -6,6 +6,9 @@ style: border
 color: danger
 description:
 published: true
+disqus_url: https://glrs.github.io/2018-04-11-jupyter-online/
+redirect_from:
+  - /2018-04-11-jupyter-online/
 ---
 
 This is a guide of how to setup a Jupyter Notebook for remote access. Not a novelty whatsoever, just a nice way to work on your projects (especially if you have a strong machine sitting somewhere), while you are wandering around carrying only your incapable laptop. As a ML/DL enthusiast I run TensorFlow in a fairly powerful remote server, so I want to exploit the most out of it, with the convenience of the Jupyter Notebook.
