@@ -28,7 +28,7 @@ jobs:
       - name: Install gems
         run: |
           gem install bundler -v 2.3.22
-          bundle config set path vendor/bundle
+          bundle config set path /tmp/bundle
           bundle install
 
       - name: Build site
