@@ -2,6 +2,9 @@
 layout: post
 title: Jupyter notebook for personal online access
 tags: guide jupyter-notebook
+style: border
+color: danger
+description:
 published: true
 ---
 

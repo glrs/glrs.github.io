@@ -1,6 +1,10 @@
 ---
 layout: post
 title: Hello GitHub world!
+tags: hello-world
+style: fill
+color: secondary
+description:
 ---
 
 This is my very first post. After months (or maybe years) of procrastination I decided to make an effort and bring my GitHub page to life. Enjoy!

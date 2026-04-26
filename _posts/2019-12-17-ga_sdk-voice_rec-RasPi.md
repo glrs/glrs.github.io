@@ -2,6 +2,9 @@
 layout: post
 title: Google Assistant SDK with Snowboy on Raspberry Pi
 tags: raspberry-pi home-automation
+style: fill
+color: primary
+description:
 published: True
 ---
 
