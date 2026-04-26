@@ -1,7 +1,7 @@
 ### Site Settings ###
-title               : playground
+title               : glrs.dev
 description         : >-
-                      Here I dispose Projects / Solutions / Ideas
+                      Projects, notes, and experiments in bioinformatics, AI, and software.
 url                 : "https://glrs.github.io"
 baseurl             : ""                     # Change to empty quotes if you are hosting your site at <your-username>.github.io directly
 repository          : glrs/glrs.github.io    # Change to <your-username>/<your-username>.github.io (or remove it if you don't need remote projects)
@@ -12,6 +12,21 @@ open_new_tab        : false                             # Opens external URLs in
 plugins:
   - jemoji
   - jekyll-redirect-from
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-feed
+
+
+### Social / SEO ###
+twitter:
+  username: anasglar
+  card: summary
+social:
+  name: Tasos Glrs
+  links:
+    - https://github.com/glrs
+    - https://stackoverflow.com/u/4618605/tasosglrs
+    - https://twitter.com/anasglar
 
 
 ### Navbar Settings ###

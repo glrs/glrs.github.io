@@ -1,5 +1,6 @@
 ---
 name: MNIST App
+title: MNIST App
 tools: [Deep Learning, TensorFlow, Streamlit]
 image: https://miro.medium.com/max/1038/1*Hhndyzeqx_BVOb5D1xArhA.png
 description: This app predicts which number you draw. It is based on a simple AI model trained on the MNIST dataset.
