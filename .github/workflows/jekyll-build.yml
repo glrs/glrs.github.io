@@ -13,17 +13,23 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container: ruby:2.7-bullseye
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "2.7"
-          bundler-cache: true
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential patch zlib1g-dev liblzma-dev
+
+      - name: Install gems
+        run: |
+          gem install bundler -v 2.3.22
+          bundle config set path vendor/bundle
+          bundle install
 
       - name: Build site
         run: bundle exec jekyll build
